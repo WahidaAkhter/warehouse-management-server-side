@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors');
+const jwt = require('jsonwebtoken');
 const app = express();
 const port = process.env.PORT || 5000;
 const { MongoClient, ServerApiVersion } = require('mongodb');
@@ -25,6 +26,16 @@ async function run() {
     try {
         await client.connect();
         const userCollection = client.db("bookExpress").collection("user");
+
+        //auth
+        app.post('/login', async (req, res) => {
+            const user = req.body;
+            const accessToken = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {
+                expiresIn: '1d'
+            })
+            res.send({ accessToken });
+        })
+
 
         app.get('/user', async (req, res) => {
             const query = {};
